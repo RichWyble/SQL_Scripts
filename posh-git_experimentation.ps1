@@ -22,21 +22,45 @@ $StagedFiles = git diff --name-only --staged
 
 write-host "Git Status for $Repo"
 Write-Host
+if ($UnstagedFiles.Count -gt 0) {
 Write-Host "Files Not Under Source Control" -ForegroundColor Red
-foreach ($uf in $UnstagedFiles)
+    foreach ($uf in $UnstagedFiles)
+    {
+        Write-Host "  * $uf" -ForegroundColor Red
+    }
+    Write-Host
+    Write-Host "     (use 'git add .' to include all uncommited files be committed)" -ForegroundColor black -BackgroundColor Gray
+    foreach ($uf in $UnstagedFiles)
+    {
+        Write-Host "     (use 'git add $uf' to include $uf in commit.)" -ForegroundColor black -BackgroundColor Gray
+    }
+} else 
 {
-    Write-Host "  * $uf" -ForegroundColor Red
-}
-Write-Host
-Write-Host "     (use 'git add .' to include all uncommited files be committed)" -ForegroundColor black -BackgroundColor Gray
-foreach ($uf in $UnstagedFiles)
-{
-    Write-Host "     (use 'git add $uf' to include $uf in commit.)" -ForegroundColor black -BackgroundColor Gray
+    Write-Host "All local files under source control" -ForegroundColor Red
+    
 }
 
 Write-Host
-Write-Host "Staged Files (Under source control, but with uncommitrd changes)" -ForegroundColor Cyan
-Write-Host $StagedFiles -ForegroundColor Cyan
-Write-Host "     (use 'git restore --staged <file>...' to unstage)" -ForegroundColor black -BackgroundColor Gray
 
+if($StagedFiles.Count -gt 0)
+{
+    Write-Host "Staged Files (Under source control, but with uncommited changes)" -ForegroundColor Cyan
+    foreach ($sf in $StagedFiles)
+    {
+        Write-Host "  * $sf" -ForegroundColor Cyan
+    }
+    Write-Host
+    Write-Host "     (use 'git add .' to include all uncommited files be committed)" -ForegroundColor black -BackgroundColor Gray
+#    Write-Host $StagedFiles -ForegroundColor Cyan
+
+    foreach ($sf in $StagedFiles)
+    {
+    Write-Host "     (use 'git restore --staged $sf' to unstage $sf)" -ForegroundColor black -BackgroundColor Gray
+    }
+
+} else
+{
+    Write-Host "No staged files for commit" -ForegroundColor Cyan
+
+}
                                                                                             
