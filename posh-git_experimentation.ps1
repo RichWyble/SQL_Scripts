@@ -1,39 +1,65 @@
 ﻿Clear-Host
 
-Import-Module posh-git
-# Need to execute "Install-Module PSColor" as an administrator
+#Add the appropriate Repo location
+$RepoLocation = "C:\Repo\RPWData\Scripts"
 
-cd C:\Repo\RPWData\Scripts
+#Uncomment if this module is actually needed
+Import-Module posh-git
+
+cd $RepoLocation
+
+#reset values
+$GitStatus = $null
+$Repo = $null
+$UnstagedFiles = $null
+$StagedFiles = $null
+
+
 # will see
 # path [branch  +Added ~Modified -Removed !Conflicted
 #   for more details reference:
 #     https://github.com/dahlbyk/posh-git?tab=readme-ov-file#git-status-summary-information
 # Run git status and capture the output
-#$GitStatus = git status
+$GitStatus = Get-GitStatus
 
-$Repo = Split-Path -Leaf (git remote get-url origin)
-$UnstagedFiles = git ls-files --others
-$UnstagedFiles
-$UnstagedFiles.count
+$Repo = $GitStatus.RepoName
+$UnstagedFiles = $GitStatus.Working
+$StagedFiles = $GitStatus.Index
+$FilesWithStagedAndUnstagedChanges = Compare-Object $UnstagedFiles $StagedFiles -IncludeEqual -ExcludeDifferent | ForEach-Object { $_.InputObject }
 
-#.Split([Environment]::NewLine)
-$uf = $UnstagedFiles#.Split(",")# -split ","
-$StagedFiles = git diff --name-only --staged
-
-write-host "Git Status for $Repo"
+write-host "Git Status for $Repo Repo"
 Write-Host
+
+if($FilesWithStagedAndUnstagedChanges.Count -gt 0)
+{
+    Write-Host "The following files have both staged and unstaged changes" -ForegroundColor White -BackgroundColor Red
+    foreach ($f in $FilesWithStagedAndUnstagedChanges)
+    {
+        Write-Host "  * $f" -ForegroundColor White -BackgroundColor Red
+    }
+    Write-Host
+} 
+ 
+
 if ($UnstagedFiles.Count -gt 0) {
-Write-Host "Files Not Under Source Control" -ForegroundColor Red
+Write-Host "Files with unstaged changes" -ForegroundColor Red
     foreach ($uf in $UnstagedFiles)
     {
         Write-Host "  * $uf" -ForegroundColor Red
     }
     Write-Host
-    Write-Host "     (use 'git add .' to include all uncommited files be committed)" -ForegroundColor black -BackgroundColor Gray
+    Write-Host " Copy the commands below to stage specific files or 'git add .' for all files" -ForegroundColor Green
+    Write-Host "     git add ."  -ForegroundColor White -BackgroundColor Black
     foreach ($uf in $UnstagedFiles)
     {
-        Write-Host "     (use 'git add $uf' to include $uf in commit.)" -ForegroundColor black -BackgroundColor Gray
+        Write-Host "     git add $uf"  -ForegroundColor White -BackgroundColor Black
     }
+    Write-Host " Use these commands below to discard changes in working directory" -ForegroundColor Green
+    foreach ($uf in $UnstagedFiles)
+    {
+        Write-Host "     git restore $uf"  -ForegroundColor White -BackgroundColor Black
+    }
+
 } else 
 {
     Write-Host "All local files under source control" -ForegroundColor Red
@@ -50,12 +76,10 @@ if($StagedFiles.Count -gt 0)
         Write-Host "  * $sf" -ForegroundColor Cyan
     }
     Write-Host
-    Write-Host "     (use 'git add .' to include all uncommited files be committed)" -ForegroundColor black -BackgroundColor Gray
-#    Write-Host $StagedFiles -ForegroundColor Cyan
-
+    Write-Host " Copy the commands below to remove specific files from staging" -ForegroundColor Green
     foreach ($sf in $StagedFiles)
     {
-    Write-Host "     (use 'git restore --staged $sf' to unstage $sf)" -ForegroundColor black -BackgroundColor Gray
+    Write-Host "     git restore --staged $sf" -ForegroundColor White -BackgroundColor Black
     }
 
 } else
@@ -63,4 +87,8 @@ if($StagedFiles.Count -gt 0)
     Write-Host "No staged files for commit" -ForegroundColor Cyan
 
 }
-                                                                                            
+Write-Host
+Write-Host
+
+ 
+
