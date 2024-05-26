@@ -1,4 +1,6 @@
-﻿Clear-Host
+﻿#For more information refer to the Wiki: https://github.com/RichWyble/Scripts/wiki/Move_files_created_by_SSMS_Script_generator_to_object_type_folders.ps1
+
+Clear-Host
 
 # Set the source.  New folders will be created based on object type.
 

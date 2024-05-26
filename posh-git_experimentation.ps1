@@ -1,4 +1,6 @@
-﻿Clear-Host
+﻿#For more information refer to the Wiki: https://github.com/RichWyble/Scripts/wiki/posh%E2%80%90git_experimentation.ps1
+
+Clear-Host
 
 #Add the appropriate Repo location
 $RepoLocation = "C:\Repo\RPWData\Scripts"
