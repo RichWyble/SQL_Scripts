@@ -1,5 +1,6 @@
 ﻿Clear-Host
-# I had to execute this as an administrator
+# Execute this as administrator
+# I had to adjust securitry settings to allow PowerShell to make changes.
 
 # Check for version... Powershell Core will may come later
 $PSVersion = $PSVersionTable.PSVersion
